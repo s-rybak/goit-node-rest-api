@@ -1,11 +1,49 @@
-import contactsService from "../services/contactsServices.js";
+import * as contactsService from "../services/contactsServices.js";
+import ctrlWrapper from "../helpers/ctrlWrapper.js";
 
-export const getAllContacts = (req, res) => {};
+const getAllContacts = async (req, res) => {
+  res.json(await contactsService.listContacts());
+};
 
-export const getOneContact = (req, res) => {};
+const getOneContact = async (req, res) => {
+  const contact = await contactsService.getContactById(req.params.id);
+  if (!contact) {
+    res.status(404).json({ message: "Not found" });
+    return;
+  }
+  res.json(contact);
+};
 
-export const deleteContact = (req, res) => {};
+const deleteContact = async (req, res) => {
+  const contact = await contactsService.removeContact(req.params.id);
+  if (!contact) {
+    res.status(404).json({ message: "Not found" });
+    return;
+  }
+  res.json(contact);
+};
 
-export const createContact = (req, res) => {};
+const createContact = async (req, res) => {
+  const newContact = await contactsService.addContact(req.body);
+  res.status(201).json(newContact);
+};
 
-export const updateContact = (req, res) => {};
+const updateContact = async (req, res) => {
+  const updatedContact = await contactsService.updateContact(
+    req.params.id,
+    req.body
+  );
+  if (!updatedContact) {
+    res.status(404).json({ message: "Not found" });
+    return;
+  }
+  res.json(updatedContact);
+};
+
+export default {
+  getAllContacts: ctrlWrapper(getAllContacts),
+  getOneContact: ctrlWrapper(getOneContact),
+  deleteContact: ctrlWrapper(deleteContact),
+  createContact: ctrlWrapper(createContact),
+  updateContact: ctrlWrapper(updateContact),
+};
