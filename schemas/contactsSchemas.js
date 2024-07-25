@@ -20,4 +20,8 @@ export const updateContactSchema = Joi.object({
     .messages({
       "string.pattern.base": "Phone number must be between 10 and 15 digits.",
     }),
-}).or("name", "email", "phone");
+})
+  .or("name", "email", "phone")
+  .messages({
+    "object.missing": "Body must have at least one field",
+  });
