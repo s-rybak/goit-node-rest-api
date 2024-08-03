@@ -9,6 +9,7 @@ export const createContactSchema = Joi.object({
     .messages({
       "string.pattern.base": "Phone number must be between 10 and 15 digits.",
     }),
+  favorite: Joi.boolean().optional(),
 });
 
 export const updateContactSchema = Joi.object({
@@ -20,8 +21,13 @@ export const updateContactSchema = Joi.object({
     .messages({
       "string.pattern.base": "Phone number must be between 10 and 15 digits.",
     }),
+  favorite: Joi.boolean().optional(),
 })
   .or("name", "email", "phone")
   .messages({
     "object.missing": "Body must have at least one field",
   });
+
+export const updateContactFavoritesSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
