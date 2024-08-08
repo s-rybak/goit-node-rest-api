@@ -5,78 +5,78 @@ import Contact from "../db/models/Contact.js";
  *
  * @returns {Promise<Array>} - The list of contacts
  */
-const listContacts = () => Contact.findAll();
+const listContacts = (query) => Contact.findAll({
+    where: query,
+});
 
 /**
- * Returns the contact by id.
- * Or null if contact not found.
- *
- * @param {int} contactId
- * @returns {Promise<Object|null>} - The contact
+ * Returns the contact by query.
+ * @param {Object} query
+ * @returns {Promise<Contact>}
  */
-const getContactById = (contactId) => Contact.findByPk(contactId);
+const findOneContact = (query) => Contact.findOne({
+    where: query,
+});
 
 /**
- * Removes the contact by id.
+ * Removes the contact by query.
  * Returns the removed contact.
  *
- * @param {int} contactId
+ * @param {Object} query
  * @returns
  */
-const removeContact = async (contactId) => {
-  const contact = await getContactById(contactId);
-  if (!contact) {
-    return null;
-  }
+const removeContact = async (query) => {
+    const contact = await findOneContact(query);
+    if (!contact) {
+        return null;
+    }
 
-  await contact.destroy();
-  return contact;
+    await contact.destroy();
+    return contact;
 };
 
 /**
  * Adds a new contact to the list.
  *
  * @param {Object} contact - The contact to add
- * @returns {Promise<{Object}>} - The new contact
+ * @returns {Promise<Contact>} - The new contact
  */
 const addContact = (contact) => Contact.create(contact);
 
 /**
- * Updates the contact by id.
+ * Updates the contact by query.
  * Returns the updated contact.
  * Or null if contact not found.
- * @param {int} contactId
+ * @param {Object} query
  * @param {Object} contact
  * @returns
  */
-const updateContact = async (contactId, contact) => {
-  const [rows, updateContact] = await Contact.update(contact, {
-    where: {
-      id: contactId,
-    },
-    returning: true,
-  });
+const updateContact = async (query, contact) => {
+    const [rows, updateContact] = await Contact.update(contact, {
+        where: query,
+        returning: true,
+    });
 
-  return rows ? updateContact[0] : null;
+    return rows ? updateContact[0] : null;
 };
 
 /**
- * Updates the contact's favorite status by id.
+ * Updates the contact's favorite status by query.
  * Returns the updated contact.
  *
- * @param {*} contactId
+ * @param {*} query
  * @param {*} contact
  * @returns
  */
-const updateStatusContact = async (contactId, contact) => {
-  return await updateContact(contactId, contact);
+const updateStatusContact = async (query, contact) => {
+    return await updateContact(query, contact);
 };
 
 export {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
+    listContacts,
+    removeContact,
+    addContact,
+    updateContact,
+    updateStatusContact,
+    findOneContact
 };

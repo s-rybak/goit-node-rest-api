@@ -1,37 +1,41 @@
 import express from "express";
 import controller from "../controllers/contactsControllers.js";
 import validateBody from "../helpers/validateBody.js";
+import {authUser} from "../middlewares/security.js";
 
 import {
-  createContactSchema,
-  updateContactSchema,
-  updateContactFavoritesSchema,
+    createContactSchema,
+    updateContactSchema,
+    updateContactFavoritesSchema,
 } from "../schemas/contactsSchemas.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", controller.getAllContacts);
+contactsRouter.get("/", authUser, controller.getAllContacts);
 
-contactsRouter.get("/:id", controller.getOneContact);
+contactsRouter.get("/:id", authUser, controller.getOneContact);
 
-contactsRouter.delete("/:id", controller.deleteContact);
+contactsRouter.delete("/:id", authUser, controller.deleteContact);
 
 contactsRouter.post(
-  "/",
-  validateBody(createContactSchema),
-  controller.createContact
+    "/",
+    authUser,
+    validateBody(createContactSchema),
+    controller.createContact
 );
 
 contactsRouter.put(
-  "/:id",
-  validateBody(updateContactSchema),
-  controller.updateContact
+    "/:id",
+    authUser,
+    validateBody(updateContactSchema),
+    controller.updateContact
 );
 
 contactsRouter.patch(
-  "/:id/favorite",
-  validateBody(updateContactFavoritesSchema),
-  controller.updateContact
+    "/:id/favorite",
+    authUser,
+    validateBody(updateContactFavoritesSchema),
+    controller.updateContact
 );
 
 export default contactsRouter;
