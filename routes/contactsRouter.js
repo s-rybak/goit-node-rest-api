@@ -1,6 +1,5 @@
 import express from "express";
 import controller from "../controllers/contactsControllers.js";
-
 import validateBody from "../helpers/validateBody.js";
 
 import {
@@ -29,7 +28,7 @@ contactsRouter.put(
   controller.updateContact
 );
 
-contactsRouter.put(
+contactsRouter.patch(
   "/:id/favorite",
   validateBody(updateContactFavoritesSchema),
   controller.updateContact

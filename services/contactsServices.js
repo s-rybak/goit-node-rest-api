@@ -1,9 +1,4 @@
-import fs from "fs/promises";
-import path from "path";
 import Contact from "../db/models/Contact.js";
-import { log } from "console";
-
-const contactsPath = path.resolve("db", "contacts.json");
 
 /**
  * Returns the list of contacts.
@@ -28,7 +23,7 @@ const getContactById = (contactId) => Contact.findByPk(contactId);
  * @param {int} contactId
  * @returns
  */
-async function removeContact(contactId) {
+const removeContact = async (contactId) => {
   const contact = await getContactById(contactId);
   if (!contact) {
     return null;
@@ -36,7 +31,7 @@ async function removeContact(contactId) {
 
   await contact.destroy();
   return contact;
-}
+};
 
 /**
  * Adds a new contact to the list.
@@ -54,7 +49,7 @@ const addContact = (contact) => Contact.create(contact);
  * @param {Object} contact
  * @returns
  */
-async function updateContact(contactId, contact) {
+const updateContact = async (contactId, contact) => {
   const [rows, updateContact] = await Contact.update(contact, {
     where: {
       id: contactId,
@@ -63,7 +58,7 @@ async function updateContact(contactId, contact) {
   });
 
   return rows ? updateContact[0] : null;
-}
+};
 
 /**
  * Updates the contact's favorite status by id.
@@ -73,9 +68,9 @@ async function updateContact(contactId, contact) {
  * @param {*} contact
  * @returns
  */
-async function updateStatusContact(contactId, contact) {
-  return updateContact(contactId, contact);
-}
+const updateStatusContact = async (contactId, contact) => {
+  return await updateContact(contactId, contact);
+};
 
 export {
   listContacts,

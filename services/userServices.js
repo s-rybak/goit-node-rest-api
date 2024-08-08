@@ -1,0 +1,54 @@
+import User from "../db/models/User.js";
+import bcrypt from "bcrypt";
+
+/**
+ * Adds a new user to the list.
+ *
+ * @param {*} user
+ * @returns
+ */
+const createUser = async (user) => {
+    try {
+        const {password} = user;
+        const hashPassword = await bcrypt.hash(password, 10);
+        const newUser = await User.create({...user, password: hashPassword});
+        return newUser;
+    } catch (error) {
+        if (error.name === "SequelizeUniqueConstraintError") {
+            error.message = "Email in use";
+        }
+        throw error;
+    }
+};
+
+
+/**
+ * Updates the user by id.
+ *
+ * @param id
+ * @param user
+ * @returns {Promise<*|null>}
+ */
+const updateUser = async (id, user) => {
+    const [rows, updateUser] = await User.update(user, {
+        where: {
+            id,
+        },
+        returning: true,
+    });
+
+    return rows ? updateUser[0] : null;
+}
+
+/**
+ * Returns the user by email
+ * Or null if user not found.
+ *
+ * @param {*} email
+ * @returns
+ */
+const getByEmail = (email) => User.findOne({where: {email}});
+
+const getById = (id) => User.findByPk(id);
+
+export {createUser, getByEmail, getById,updateUser};

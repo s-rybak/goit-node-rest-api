@@ -1,27 +1,26 @@
 import Joi from "joi";
+import { emailRegex } from "../constants/constants.js";
 
 export const createContactSchema = Joi.object({
   name: Joi.string().min(1).max(255).required(),
-  email: Joi.string().email().required(),
+  email: Joi.string().regex(emailRegex).required(),
   phone: Joi.string()
     .pattern(/^[0-9]{10,15}$/)
     .required()
     .messages({
       "string.pattern.base": "Phone number must be between 10 and 15 digits.",
-    }),
-  favorite: Joi.boolean().optional(),
+    })
 });
 
 export const updateContactSchema = Joi.object({
   name: Joi.string().min(1).max(255).optional(),
-  email: Joi.string().email().optional(),
+  email: Joi.string().regex(emailRegex).optional(),
   phone: Joi.string()
     .pattern(/^[0-9]{10,15}$/)
     .optional()
     .messages({
       "string.pattern.base": "Phone number must be between 10 and 15 digits.",
-    }),
-  favorite: Joi.boolean().optional(),
+    })
 })
   .or("name", "email", "phone")
   .messages({
