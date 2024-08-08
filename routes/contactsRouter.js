@@ -1,17 +1,19 @@
 import express from "express";
 import controller from "../controllers/contactsControllers.js";
 import validateBody from "../helpers/validateBody.js";
+import validateQuery from "../helpers/validateQuery.js";
 import {authUser} from "../middlewares/security.js";
 
 import {
     createContactSchema,
     updateContactSchema,
     updateContactFavoritesSchema,
+    queryContactSchema,
 } from "../schemas/contactsSchemas.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", authUser, controller.getAllContacts);
+contactsRouter.get("/", authUser, validateQuery(queryContactSchema), controller.getAllContacts);
 
 contactsRouter.get("/:id", authUser, controller.getOneContact);
 

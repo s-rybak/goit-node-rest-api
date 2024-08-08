@@ -3,8 +3,17 @@ import ctrlWrapper from "../helpers/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 
 const getAllContacts = async (req, res) => {
-    res.json(await contactsService.listContacts({
-        owner: req.user.id
+    const query = {
+        owner: req.user.id,
+    };
+
+    if(typeof req.query.favorite !== "undefined") {
+        query.favorite = req.query.favorite;
+    }
+
+    res.json(await contactsService.listContacts(query, {
+        page: Number(req.query.page ?? 1),
+        limit: Number(req.query.limit ?? 10)
     }));
 };
 

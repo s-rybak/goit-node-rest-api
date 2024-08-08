@@ -5,8 +5,10 @@ import Contact from "../db/models/Contact.js";
  *
  * @returns {Promise<Array>} - The list of contacts
  */
-const listContacts = (query) => Contact.findAll({
+const listContacts = (query, {page = 1, limit = 10}) => Contact.findAll({
     where: query,
+    limit,
+    offset: (page - 1) * limit
 });
 
 /**
