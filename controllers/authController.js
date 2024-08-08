@@ -80,9 +80,26 @@ const current = async (req, res) => {
     });
 };
 
+/**
+ * Update user subscription controller
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const updateSubscription = async (req, res) => {
+    const {id} = req.user;
+    const {subscription} = req.body;
+    const updatedUser = await usersService.updateUserSubscription(id, subscription);
+    res.json({
+        email: updatedUser.email,
+        subscription: updatedUser.subscription,
+    });
+}
+
 export default {
     signUp: ctrlWrapper(signUp),
     signIn: ctrlWrapper(signIn),
     signOut: ctrlWrapper(signOut),
     current: ctrlWrapper(current),
+    updateSubscription: ctrlWrapper(updateSubscription),
 };

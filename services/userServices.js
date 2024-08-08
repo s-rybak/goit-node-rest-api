@@ -41,6 +41,16 @@ const updateUser = async (id, user) => {
 }
 
 /**
+ * Updates the user subscription by id.
+ * @param id
+ * @param subscription
+ * @returns {Promise<*|null>}
+ */
+const updateUserSubscription = async (id, subscription) => {
+    return updateUser(id,{subscription});
+}
+
+/**
  * Returns the user by email
  * Or null if user not found.
  *
@@ -51,4 +61,4 @@ const getByEmail = (email) => User.findOne({where: {email}});
 
 const getById = (id) => User.findByPk(id);
 
-export {createUser, getByEmail, getById,updateUser};
+export {createUser, getByEmail, getById, updateUser, updateUserSubscription};
