@@ -14,9 +14,10 @@ const {JWT_SECRET} = process.env;
 const signUp = async (req, res) => {
     const user = await usersService.createUser(req.body);
     res.status(201).json({
-        id: user.id,
-        email: user.email,
-        subscription: user.subscription,
+        user: {
+            email: user.email,
+            subscription: user.subscription,
+        }
     });
 };
 
@@ -30,11 +31,11 @@ const signIn = async (req, res) => {
     const {email, password} = req.body;
     const user = await usersService.getByEmail(email);
     if (!user) {
-        throw HttpError(401, "Email or password invalid");
+        throw HttpError(401, "Email or password is wrong");
     }
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
-        throw HttpError(401, "Email or password invalid");
+        throw HttpError(401, "Email or password is wrong");
     }
 
     const payload = {
@@ -46,6 +47,10 @@ const signIn = async (req, res) => {
 
     res.json({
         token,
+        user: {
+            email: user.email,
+            subscription: user.subscription,
+        }
     });
 };
 
