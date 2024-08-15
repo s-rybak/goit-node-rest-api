@@ -14,7 +14,7 @@ const createUser = async (user) => {
         const hashPassword = await bcrypt.hash(password, 10);
         return await User.create({
             ...user,
-            avatarURL:gravatar.url('emerleite@gmail.com', {s:250}, true),
+            avatarURL:gravatar.url(user.email, {s:250}, true),
             password: hashPassword
         });
     } catch (error) {
