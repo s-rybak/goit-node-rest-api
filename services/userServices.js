@@ -1,5 +1,6 @@
 import User from "../db/models/User.js";
 import bcrypt from "bcrypt";
+import gravatar from "gravatar";
 
 /**
  * Adds a new user to the list.
@@ -11,8 +12,11 @@ const createUser = async (user) => {
     try {
         const {password} = user;
         const hashPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({...user, password: hashPassword});
-        return newUser;
+        return await User.create({
+            ...user,
+            avatarURL:gravatar.url('emerleite@gmail.com', {s:250}, true),
+            password: hashPassword
+        });
     } catch (error) {
         if (error.name === "SequelizeUniqueConstraintError") {
             error.message = "Email in use";
@@ -47,7 +51,7 @@ const updateUser = async (id, user) => {
  * @returns {Promise<*|null>}
  */
 const updateUserSubscription = async (id, subscription) => {
-    return updateUser(id,{subscription});
+    return updateUser(id, {subscription});
 }
 
 /**

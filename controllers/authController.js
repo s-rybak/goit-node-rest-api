@@ -3,6 +3,8 @@ import HttpError from "../helpers/HttpError.js";
 import * as usersService from "../services/userServices.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import path from "node:path";
+import fs from "node:fs/promises";
 
 const {JWT_SECRET} = process.env;
 
@@ -17,6 +19,7 @@ const signUp = async (req, res) => {
         user: {
             email: user.email,
             subscription: user.subscription,
+            avatarURL: user.avatarURL
         }
     });
 };
@@ -50,6 +53,7 @@ const signIn = async (req, res) => {
         user: {
             email: user.email,
             subscription: user.subscription,
+            avatarURL: user.avatarURL,
         }
     });
 };
@@ -73,10 +77,11 @@ const signOut = async (req, res) => {
  * @returns {Promise<void>}
  */
 const current = async (req, res) => {
-    const {email, subscription} = req.user;
+    const {email, subscription,avatarURL} = req.user;
     res.json({
         email,
         subscription,
+        avatarURL,
     });
 };
 
@@ -96,10 +101,29 @@ const updateSubscription = async (req, res) => {
     });
 }
 
+/**
+ * Update user avatar controller
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const updateAvatar = async (req, res) => {
+    const {id} = req.user;
+    const {path: oldPath, filename} = req.file;
+    const newPath = path.join(path.resolve("public", "avatars"), filename);
+    const avatarURL = `/avatars/${filename}`;
+    await fs.rename(oldPath, newPath);
+    const updatedUser = await usersService.updateUser(id, {avatarURL});
+    res.json({
+        avatarURL: updatedUser.avatarURL,
+    });
+}
+
 export default {
     signUp: ctrlWrapper(signUp),
     signIn: ctrlWrapper(signIn),
     signOut: ctrlWrapper(signOut),
     current: ctrlWrapper(current),
     updateSubscription: ctrlWrapper(updateSubscription),
+    updateAvatar: ctrlWrapper(updateAvatar),
 };
