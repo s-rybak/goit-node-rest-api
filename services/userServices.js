@@ -1,6 +1,8 @@
 import User from "../db/models/User.js";
 import bcrypt from "bcrypt";
 import gravatar from "gravatar";
+import {sendVerifyEmail} from "./emailServices.js";
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Adds a new user to the list.
@@ -12,11 +14,15 @@ const createUser = async (user) => {
     try {
         const {password} = user;
         const hashPassword = await bcrypt.hash(password, 10);
-        return await User.create({
+        const verificationToken = uuidv4();
+        const newUser = await User.create({
             ...user,
-            avatarURL:gravatar.url(user.email, {s:250}, true),
-            password: hashPassword
+            avatarURL: gravatar.url(user.email, {s: 250}, true),
+            password: hashPassword,
+            verificationToken
         });
+        sendVerifyEmail(newUser);
+        return newUser;
     } catch (error) {
         if (error.name === "SequelizeUniqueConstraintError") {
             error.message = "Email in use";
@@ -63,6 +69,18 @@ const updateUserSubscription = async (id, subscription) => {
  */
 const getByEmail = (email) => User.findOne({where: {email}});
 
+/**
+ * Returns the user by id
+ * @param id
+ * @returns {Promise<Model<any, TModelAttributes> | null>}
+ */
 const getById = (id) => User.findByPk(id);
 
-export {createUser, getByEmail, getById, updateUser, updateUserSubscription};
+/**
+ * Returns the user by verification token
+ * @param verificationToken
+ * @returns {*}
+ */
+const getByVerificationToken = (verificationToken) => User.findOne({where: {verificationToken}});
+
+export {createUser, getByEmail, getById, updateUser, updateUserSubscription, getByVerificationToken};

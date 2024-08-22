@@ -1,7 +1,12 @@
 import express from "express";
 import controller from "../controllers/authController.js";
 import validateBody from "../helpers/validateBody.js";
-import {createUserSchema, loginUserSchema, updateUserSubscription} from "../schemas/userSchemas.js";
+import {
+    createUserSchema,
+    loginUserSchema,
+    resendVerificationEmailSchema,
+    updateUserSubscription
+} from "../schemas/userSchemas.js";
 import {authUser} from "../middlewares/security.js";
 import upload from "../middlewares/upload.js";
 
@@ -18,5 +23,9 @@ authRouter.get("/current", authUser, controller.current);
 authRouter.patch("/subscription", authUser, validateBody(updateUserSubscription), controller.updateSubscription);
 
 authRouter.patch("/avatars", authUser, upload.single("avatar"), controller.updateAvatar);
+
+authRouter.get("/verify/:verificationToken", controller.verifyEmail);
+
+authRouter.post("/verify", validateBody(resendVerificationEmailSchema), controller.resendVerificationEmail);
 
 export default authRouter;

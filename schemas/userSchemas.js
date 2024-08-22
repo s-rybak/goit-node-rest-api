@@ -16,3 +16,8 @@ export const loginUserSchema = Joi.object({
     password: Joi.string().min(6).required(),
     email: Joi.string().regex(emailRegex).required(),
 });
+
+export const resendVerificationEmailSchema = Joi.object({
+    email: Joi.string().regex(emailRegex).required(),
+});
+

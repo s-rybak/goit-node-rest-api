@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import path from "node:path";
 import fs from "node:fs/promises";
+import {sendVerifyEmail} from "../services/emailServices.js";
 
 const {JWT_SECRET} = process.env;
 
@@ -25,6 +26,54 @@ const signUp = async (req, res) => {
 };
 
 /**
+ * Verify email controller
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const verifyEmail = async (req, res) => {
+    const {verificationToken} = req.params;
+    const user = await usersService.getByVerificationToken(verificationToken);
+    if (!user) {
+        throw HttpError(404, "User not found or already verified");
+    }
+
+    await usersService.updateUser(user.id, {
+        verify: true,
+        verificationToken: null,
+    });
+
+    res.json({
+        message: "Email verified success"
+    });
+
+}
+
+/**
+ * Resend verification email controller
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const resendVerificationEmail = async (req, res) => {
+    const {email} = req.body;
+    const user = await usersService.getByEmail(email);
+    if (!user) {
+        throw HttpError(404, "User not found");
+    }
+
+    if (user.verify) {
+        throw HttpError(400, "Email already verified");
+    }
+
+    sendVerifyEmail(user);
+
+    res.json({
+        message: "Verification email was resent successfully"
+    })
+}
+
+/**
  * Sign in controller
  * @param {*} req
  * @param {*} res
@@ -35,6 +84,9 @@ const signIn = async (req, res) => {
     const user = await usersService.getByEmail(email);
     if (!user) {
         throw HttpError(401, "Email or password is wrong");
+    }
+    if (!user.verify) {
+        throw HttpError(401, "Email is not verified");
     }
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
@@ -77,7 +129,7 @@ const signOut = async (req, res) => {
  * @returns {Promise<void>}
  */
 const current = async (req, res) => {
-    const {email, subscription,avatarURL} = req.user;
+    const {email, subscription, avatarURL} = req.user;
     res.json({
         email,
         subscription,
@@ -126,4 +178,6 @@ export default {
     current: ctrlWrapper(current),
     updateSubscription: ctrlWrapper(updateSubscription),
     updateAvatar: ctrlWrapper(updateAvatar),
+    verifyEmail: ctrlWrapper(verifyEmail),
+    resendVerificationEmail: ctrlWrapper(resendVerificationEmail),
 };
