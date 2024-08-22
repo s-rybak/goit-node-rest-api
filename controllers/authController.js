@@ -35,7 +35,7 @@ const verifyEmail = async (req, res) => {
     const {verificationToken} = req.params;
     const user = await usersService.getByVerificationToken(verificationToken);
     if (!user) {
-        throw HttpError(404, "User not found or already verified");
+        throw HttpError(404, "User not found");
     }
 
     await usersService.updateUser(user.id, {
@@ -44,7 +44,7 @@ const verifyEmail = async (req, res) => {
     });
 
     res.json({
-        message: "Email verified success"
+        message: "Verification successful"
     });
 
 }
@@ -63,13 +63,13 @@ const resendVerificationEmail = async (req, res) => {
     }
 
     if (user.verify) {
-        throw HttpError(400, "Email already verified");
+        throw HttpError(400, "Verification has already been passed");
     }
 
     sendVerifyEmail(user);
 
     res.json({
-        message: "Verification email was resent successfully"
+        message: "Verification email sent"
     })
 }
 

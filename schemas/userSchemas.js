@@ -18,6 +18,8 @@ export const loginUserSchema = Joi.object({
 });
 
 export const resendVerificationEmailSchema = Joi.object({
-    email: Joi.string().regex(emailRegex).required(),
+    email: Joi.string().regex(emailRegex).required().messages({
+        "any.required": "missing required field email"
+    }),
 });
 
